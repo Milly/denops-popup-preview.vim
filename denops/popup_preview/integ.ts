@@ -38,7 +38,8 @@ function getUltisnipsSnippets(
   return stylizeSnippet(text);
 }
 
-function getInfoField(
+async function getInfoField(
+  denops: Denops,
   item: VimCompleteItem,
   config: Config,
 ): SearchResult {
@@ -51,6 +52,59 @@ function getInfoField(
       found: true,
     };
   }
+
+  if (config.supportKindFile && item.kind === "file") {
+    const cwd = await denops.call("getcwd") as string;
+    const target = path.join(cwd, item.abbr || item.word);
+    let content = "";
+    try {
+      content = Deno.readTextFileSync(target);
+    } catch (e) {
+      // pass
+    }
+    if (content.length) {
+      const ext = path.extname(target).slice(1);
+      let lines: string[] = [];
+      if (ext.length) {
+        lines = convertInputToMarkdownLines({
+          language: ext,
+          value: content,
+        }, []);
+      } else {
+        lines = convertInputToMarkdownLines({
+          kind: "plaintext",
+          value: content,
+        }, []);
+      }
+      return {
+        lines,
+        found: true,
+      };
+    }
+  }
+
+  if (config.supportKindDir && item.kind === "dir") {
+    const cwd = await denops.call("getcwd") as string;
+    const target = path.join(cwd, item.abbr || item.word);
+    let files = "";
+    try {
+      files = Array.from(Deno.readDirSync(target)).map(({ name }) => name).join(
+        "\n",
+      );
+    } catch (e) {
+      // pass
+    }
+    if (files.length) {
+      return {
+        lines: convertInputToMarkdownLines({
+          kind: "plaintext",
+          value: files,
+        }, []),
+        found: true,
+      };
+    }
+  }
+
   return { found: false };
 }
 
@@ -84,7 +138,7 @@ export async function searchUserdata(
   selected: number,
 ): Promise<SearchResult> {
   if (!item.user_data) {
-    return getInfoField(item, config);
+    return getInfoField(denops, item, config);
   }
   const filetype = await op.filetype.getLocal(denops);
   let decoded: JsonUserData = null;
@@ -112,7 +166,7 @@ export async function searchUserdata(
 
   // neither json nor string
   if (!decoded) {
-    return getInfoField(item, config);
+    return getInfoField(denops, item, config);
   }
 
   // vim-lsp
@@ -178,5 +232,5 @@ export async function searchUserdata(
   }
 
   // unknown object. search for info item
-  return getInfoField(item, config);
+  return getInfoField(denops, item, config);
 }

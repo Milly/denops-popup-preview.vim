@@ -5,6 +5,8 @@ export type Config = {
   winblend?: number;
   supportVsnip: boolean;
   supportInfo: boolean;
+  supportKindFile: boolean;
+  supportKindDir: boolean;
   supportUltisnips: boolean;
   delay: number;
   debug: boolean;
@@ -17,6 +19,8 @@ export function getDefaultDocConfig(): Config {
     maxHeight: 30,
     supportVsnip: true,
     supportInfo: true,
+    supportKindFile: true,
+    supportKindDir: true,
     supportUltisnips: true,
     delay: 50,
     debug: false,

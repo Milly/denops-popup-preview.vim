@@ -108,6 +108,14 @@ supportInfo				*denops-popup-preview-option-supportInfo*
 		enabled.
 		(default: v:true)
 
+supportKindFile			*denops-popup-preview-option-supportKindFile*
+		If it is true, file content is shown.
+		(default: v:true)
+
+supportKindDir			*denops-popup-preview-option-supportKindDir*
+		If it is true, directory entries is shown.
+		(default: v:true)
+
 delay					*denops-popup-preview-option-delay*
     		Time in milliseconds to delay the completion documentation
 		popup. If you feel slow, specify large value.

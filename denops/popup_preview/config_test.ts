@@ -13,6 +13,8 @@ Deno.test("makeConfig merges user config with default", () => {
     maxHeight: 30,
     supportVsnip: true,
     supportInfo: true,
+    supportKindFile: true,
+    supportKindDir: true,
     supportUltisnips: true,
     delay: 50,
     winblend: 10,
